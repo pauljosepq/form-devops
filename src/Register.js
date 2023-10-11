@@ -13,18 +13,31 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react';
 import {useState} from "react";
+import axios from 'axios';
 
-function App() {
+function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
+  const [username, setUsername] = useState(false);
 
-  const handleSignIn = () => {
+  const handleSignIn = async () => {
 
-    // Save the email, hashed password, and remember me status in the local storage
-    localStorage.setItem('email', email);
-    localStorage.setItem('password', password);
-    localStorage.setItem('rememberMe', rememberMe.toString());
+    try {
+      const data = {
+        username: username,
+        email: email,
+        password: password
+      };
+
+      const response = await axios.post(`http://localhost:3001/api/auth/register`, data);
+
+      if(response.status === 201) {
+        window.location.href = '/login';
+      }
+  
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
 
   return (
@@ -46,6 +59,10 @@ function App() {
           boxShadow={'lg'}
           p={8}>
           <Stack spacing={4}>
+          <FormControl id="username">
+              <FormLabel>Username</FormLabel>
+              <Input type="username" onChange={(e) => setUsername(e.target.value)}/>
+            </FormControl>
             <FormControl id="email">
               <FormLabel>Email address</FormLabel>
               <Input type="email" onChange={(e) => setEmail(e.target.value)}/>
@@ -55,15 +72,6 @@ function App() {
               <Input type="password" onChange={(e) => setPassword(e.target.value)}/>
             </FormControl>
             <Stack spacing={10}>
-              <Stack
-                direction={{ base: 'column', sm: 'row' }}
-                align={'start'}
-                justify={'space-between'}>
-                <Checkbox checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} >
-                  Remember me
-                </Checkbox>
-                <Link color={'blue.400'}>Forgot password?</Link>
-              </Stack>
               <Button
                 bg={'blue.400'}
                 color={'white'}
@@ -82,4 +90,4 @@ function App() {
   );
 }
 
-export default App;
+export default Login;
